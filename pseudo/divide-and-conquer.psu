@@ -1,0 +1,149 @@
+A = [16,25,22,3,14,9,23] // Same Array is used in every example
+
+// All the different sorting algos uses 1-index for arrays and are ascending.
+// Only minor modification would be needed for descending.
+// Assumes swap(A,B) is a function to swap the position of A with B
+
+// Selection sort [50]
+for (i = 1 to n-1) {
+  minIndex = 1
+  for (j = i + 1 to n) {
+    if (A[j] < A[minIndex]) {
+      minIndex = j
+    }
+  }
+  swap(A[i], A[minIndex])
+}
+
+// Insertion Sort [52]
+for (i=2 to n) {
+  valueInsert = A[i]
+  j = i 
+  while (j > i and A[j-1] > valueInsert) {
+    A[j] = A[j-1]
+    j = j - 1
+  }
+  A[j]=valueInsert
+}
+
+// Bubble Sort [55]
+for (i=2 to n-1) {
+  for (j=n to i-1) {
+    if A[j-1] > A[j] {
+      swap(A[j-1], A[j])
+    }
+  }
+}
+
+// Heap sort [60]
+// Assumes insertNode(H, k) is a function to insert a new internal node with the value of k into heap H
+// Assumes removeNode(H) is a function to remove the root node from the H and recalculate the remaining nodes to maintain the heap.
+// Performs better than the previous sorting algos due to less calculations to sort large amounts of data
+for (i = 1 to n) {
+  insertNode(H, A[i]) // upHeap as required
+}
+for (i = 1 to n) {
+    A[i] = removeNode(H) // downHeap as required
+}
+
+// Merge Sort functions [70]
+// Breaking up an array into smaller arrays and merging the arrays in the correct sorted order
+
+function MergeSort(arr) {
+  if (length(arr) <= 1) {
+    result = arr
+  } else {
+    indexMid = length(arr) / 2
+    arrLeft = MergeSort(A[1:indexMid])
+    arrRight = MergeSort(A[indexMid:length(arr)])
+    result = MergeTwoarrays(arrLeft, arrRight)
+  }
+  return result
+}
+
+function MergeTwoArrays(left, right) {
+  indexLeft = 1
+  indexRight = 1
+  tempArr = []
+
+  while (indexLeft <= length(left) or indexRight <= length(right)) {
+    if (indexLeft <= length(left) and indexRight <= length(right)) {
+      if left[indexLeft] < right[indexRight] {
+        tempArr.push(left[indexLeft])
+        indexLeft++
+      } else {
+        tempArr.push(right[indexRight])
+        indexRight++
+      }
+    } else if (indexRight > length(right)) {
+      tempArr.push(left[indexLeft])
+      indexLeft++
+    } else if (indexLeft > length(left)) {
+      tempArr.push(right[indexRight])
+      indexRight++
+    }
+  }
+  return tempArr
+}
+
+// Quick Sort [75]
+// Recursive and considered one of the best for sorting according to the book
+function QuickSort(arr) {
+  if (length(arr) <= 1)) {
+    return arr
+  }
+  // Select a pivot value from arr, for simplicity: first index (as mentioned previously, all this is 1-index, not 0-index)
+  // other alternatives; middle element, last element, choose a random element, or 
+  // choose between the first, middle or last element (sort them and pick the middle of those, i.e 16, 3, 23 -> 3, 16, 23 -> 16)
+  pivot = 1
+  arrLess = []
+  arrPivot = []
+  arrMore = []
+  for (i= 1 to length(arr)) {
+    if (a[i] == pivot) {
+      arrPivot.push(a[i])
+    } else if (a[i] < pivot){
+      arrLess.push(a[i])
+    } else {
+      arrMore.push(a[i])
+    }
+  }
+  tempLess = QuickSort(arrLess)
+  tempMore = QuickSort(arrMore)
+  return [tempLess, arrPivot, tempMore]
+}
+
+// Binary Search [80]
+// Sequential search to find the index of the value toFind - Fine for smaller arrays.
+function SeqSearch(toFind, arr) {
+  i = 1
+  while (i <= length(arr) and arr[i] != toFind) {
+    i++
+  }
+  if (arr[i] == toFind) {
+    return i
+  }
+  return -1
+}
+// Binary search requires a sorted array first.
+// Could be improved with relative position based on the lowest and highest values in the array, compared to the input (toFind)
+function BinarySearch(toFind, arr) {
+  indexLow = 1
+  indexHigh = length(arr)
+  indexFound = -1
+
+  while (indexFound == -1 and indexLow <= indexHigh) {
+    indexMid = (indexLow + indexHigh) / 2
+
+    if (arr[indexMid] == toFind) {
+      indexFound = indexMid
+    }
+    if (arr[indexMid] > toFind) {
+      indexHigh = indexMid - 1
+    }
+    if (arr[indexMid] < toFind) {
+      indexLow = indexMid + 1
+    }
+  }
+  return indexFound
+}
