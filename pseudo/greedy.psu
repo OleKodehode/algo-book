@@ -1,0 +1,58 @@
+// Knapsack Problem
+
+knapSackItems = {
+  "A": {
+    "weight": 7,
+    "value": 2975
+  },
+  "B": {
+    "weight": 3,
+    "value": 1230
+  },
+  "C": {
+    "weight": 9,
+    "value": 3870
+  },
+  "D": {
+    "weight": 5,
+    "value": 2250
+  }
+}
+
+// Fractional
+// allowed to choose fractions of an item - Unlimited amount of each item
+function FractionalKnapsack(items, capacity) {
+  bestRatio = 0
+  bestItem = null
+
+  // Find the highest value per weight unit (KG)
+  for (key in items) {
+    item = items[key]
+
+    if (item.weight <= 0 | item.value <= 0) continue // skip invalid entries
+
+    ratio = item.value / item.weight
+
+    if (ratio > bestRatio) {
+      bestRatio = ratio
+      bestItem = item // Store the whole item-object for later use.
+    }
+  }
+
+  // if for some reason there were no bestItem
+  if (bestItem == null) {
+    return { totalValue: 0, totalUnits: 0, chosenItem: null }
+  }
+
+  // probably a good idea to limit how many decimals are in these variables
+  totalUnits = capacity / bestItem.weight  
+  totalValue = totalUnits * bestItem.value
+
+  // What you return depends on the situation - Example would be an object featuring the total value, total amount of units and the item itself
+  // Though other situations might require you to just return the totalUnits or totalValue
+  return {
+    "totalValue": totalValue,
+    "totalUnits": totalUnits,
+    chosenItem: bestItem
+  }
+}
