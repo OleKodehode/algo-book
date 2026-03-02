@@ -53,6 +53,41 @@ function FractionalKnapsack(items, capacity) {
   return {
     "totalValue": totalValue,
     "totalUnits": totalUnits,
-    chosenItem: bestItem
+    "chosenItem": bestItem
+  }
+}
+
+// 0/1 - 1 bounded knapSack: Only 1 of each item
+function ZeroOneKnapsack(items, capacity) {
+  capacityUsed = 0 // Keep track of how much is used
+  candidates = [] // for making a copy of items
+  totalValue = 0 // Keeping track of total value for the return object
+  selected = []
+
+  foreach (item in items) {
+    if item.weight > capacity { continue } 
+    candidates.push({...item, ratio: item.value / item.weight})
+  }
+
+  // Sort the candidates in an ascending order based on value ratio (For using pop(), since pop is more common than shift, and possibly more optimal)
+  candidates.sort((a,b) => a.ratio - b.ratio)
+
+  
+  while (capacityUsed < capacity && length(candidates) > 0) {
+    nextItem = candidates.pop() // Take the highest value item out
+
+    if (capacityUsed + nextItem.weight <= capacity) {
+      selected.push(nextItem)
+      totalValue += nextItem.value
+      capacityUsed += nextItem.weight
+      }
+      // If the if-statement isn't trigger then we are just moving onto the next item
+    }
+  }
+
+  return {
+    "totalValue": totalValue,
+    "capacityUsed": capacityUsed,
+    "selected": selected
   }
 }
