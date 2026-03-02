@@ -1,47 +1,55 @@
 // Knapsack Problem
-
-knapSackItems = {
-  "A": {
+// limit field only used in bounded.
+knapSackItems = [
+  {
+    "key": "A",
     "weight": 7,
-    "value": 2975
+    "value": 2975,
+    "limit": 5,
   },
-  "B": {
+  {
+    "key": "B",
     "weight": 3,
-    "value": 1230
+    "value": 1230,
+    "limit": 5,
   },
-  "C": {
+  {
+    "key": "C",
     "weight": 9,
-    "value": 3870
+    "value": 3870,
+    "limit": 5,
   },
-  "D": {
+  {
+    "key": "D",
     "weight": 5,
-    "value": 2250
+    "value": 2250,
+    "limit": 5,
   }
-}
+]
 
 // Fractional
 // allowed to choose fractions of an item - Unlimited amount of each item
 function FractionalKnapsack(items, capacity) {
   bestRatio = 0
   bestItem = null
+  bestKey = null
 
   // Find the highest value per weight unit (KG)
-  for (key in items) {
-    item = items[key]
-
-    if (item.weight <= 0 | item.value <= 0) continue // skip invalid entries
-
+  foreach(item in items){
+    if (item.weight <= 0 || item.value <= 0) continue // skip invalid entries
+    
     ratio = item.value / item.weight
 
     if (ratio > bestRatio) {
       bestRatio = ratio
       bestItem = item // Store the whole item-object for later use.
+      bestKey = item.key
     }
   }
 
   // if for some reason there were no bestItem
   if (bestItem == null) {
-    return { totalValue: 0, totalUnits: 0, chosenItem: null }
+    return { totalValue: 0, totalUnits: 0, selected: null, message: "No Valid items" }
   }
 
   // probably a good idea to limit how many decimals are in these variables
@@ -52,8 +60,15 @@ function FractionalKnapsack(items, capacity) {
   // Though other situations might require you to just return the totalUnits or totalValue
   return {
     "totalValue": totalValue,
-    "totalUnits": totalUnits,
-    "chosenItem": bestItem
+    "capacityUsed": capacity, // unbound fractional should always use up all the capacity
+    "selected": {
+      [bestKey]: {
+        weight: bestItem.weight,
+        value: bestItem.value,
+        count: totalUnits.ToFixed(2)
+      }
+    },
+    message: "success"
   }
 }
 
@@ -62,22 +77,26 @@ function ZeroOneKnapsack(items, capacity) {
   capacityUsed = 0 // Keep track of how much is used
   candidates = [] // for making a copy of items
   totalValue = 0 // Keeping track of total value for the return object
-  selected = []
+  selected = {}
 
   foreach (item in items) {
-    if item.weight > capacity { continue } 
+    if (item.weight > capacity || item.weight <= 0 || item.value <= 0) continue
     candidates.push({...item, ratio: item.value / item.weight})
   }
 
   // Sort the candidates in an ascending order based on value ratio (For using pop(), since pop is more common than shift, and possibly more optimal)
   candidates.sort((a,b) => a.ratio - b.ratio)
 
-  
-  while (capacityUsed < capacity && length(candidates) > 0) {
+  while (capacityUsed < capacity && candidates.length > 0) {
     nextItem = candidates.pop() // Take the highest value item out
 
     if (capacityUsed + nextItem.weight <= capacity) {
-      selected.push(nextItem)
+      key = nextItem.key || length(selected) + 1
+      selected[key] = {
+        weight: nextItem.weight,
+        value: nextItem.value,
+        count: 1
+      }
       totalValue += nextItem.value
       capacityUsed += nextItem.weight
       }
@@ -88,6 +107,53 @@ function ZeroOneKnapsack(items, capacity) {
   return {
     "totalValue": totalValue,
     "capacityUsed": capacityUsed,
-    "selected": selected
+    "selected": selected,
+    "message": "success"
+  }
+}
+
+/*
+* BoundedKnapsack assumes there is a limit field on each item in the array.
+* Alternative would be to add another parameter "Limit" and insert it into each item.
+*/
+function BoundedKnapsack(items, capacity){
+  capacityUsed = 0 // Keep track of how much is used
+  candidates = [] // for making a copy of items
+  totalValue = 0 // Keeping track of total value for the return object
+  selected = {}
+
+  foreach (item in items) {
+    // skip invalid items - Items with no limit, no weight, no value or weight above capacity
+    if (item.weight > capacity || item.weight <= 0 || item.limit <= 0 || item.value <= 0) { continue } 
+    candidates.push({...item, ratio: item.value / item.weight})
+  }
+
+  // Ascending sort for pop in while loop
+  candidates.sort((a,b) => a.ratio - b.ratio)
+
+   while (capacityUsed < capacity && candidates.length > 0) {
+    nextItem = candidates.pop()
+
+    if (capacity - capacityUsed < nextItem.weight) continue
+
+    maxCount = floor((capacity - capacityUsed) / nextItem.weight) // take as many items we can without going over the limit
+    takeCount = min(maxCount, nextItem.limit)
+
+    // skip item if we can't take any units
+    if (takeCount > 0) { 
+      key = nextItem.key || length(selected) + 1
+      capacityUsed += takeCount * nextItem.weight
+      totalValue += takeCount * nextItem.value
+
+      // add the item and the amount taken
+      selected[key] = { weight: nextItem.weight, value: nextItem.value, count: takeCount }
+    }
+  }
+
+  return {
+    "totalValue": totalValue,
+    "capacityUsed": capacityUsed,
+    "selected": selected,
+    "message": "success"
   }
 }
