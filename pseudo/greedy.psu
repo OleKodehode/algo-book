@@ -202,3 +202,146 @@ function UnboundedKnapsack(items, capacity) {
 
 // ------------ End of KnapSack ------------
 
+// Job Scheduling
+
+// Jobs is the available jobs, with a name, profit (in thousands/K), and a deadline (sequence in an array)
+// Just an example of what an input could be. Could be less or more entries than this.
+Jobs = [
+  {
+    "name": "A",
+    "profit": 65,
+    "deadline": 2
+  },
+  {
+    "name": "B",
+    "profit": 45,
+    "deadline": 1
+  },
+  {
+    "name": "C",
+    "profit": 75,
+    "deadline": 2
+  },
+  {
+    "name": "D",
+    "profit": 30,
+    "deadline": 2
+  },
+  {
+    "name": "E",
+    "profit": 35,
+    "deadline": 3
+  },
+  {
+    "name": "F",
+    "profit": 79,
+    "deadline": 1
+  },
+]
+
+function GreedyJobScheduling(jobs) {
+  totalProfit = 0
+  selected = {}
+  jobsCopy = [...jobs] // always copy inputs and mutate the copy instead
+
+  // ascending by profit to utilize pop in while loop
+  jobsCopy.sort((a,b) => a.profit - b.profit)
+
+
+  while (jobsCopy.length > 0) {
+    job = jobsCopy.pop()
+    currentSlot = Object.keys(selected).length + 1 // 1-index to follow the book
+
+    if (job.deadline < currentSlot) continue // Skip if we're over the deadline - Early continue
+
+    selected[job.name] = { ...job }
+    totalProfit += job.profit
+  }
+
+  return {
+    "totalProfit": totalProfit,
+    "totalJobs": Object.keys(selected).length,
+    "selectedJobs": selected,
+    "message": "success"
+  }
+}
+
+// ------------ End of Job Scheduling ------------
+
+// Graphs
+
+// Shorest path
+// Greedy algo means (in the example given) that it'll choose A -> D -> C -> F (36)
+// even when A -> D -> E -> -> F is shorter (30), as it only considers the local options.
+function ShortestPath() {
+  // Graph from the book - Start node A, End node F.
+  graph = {
+    "A": { "B": 29, "D": 7},
+    "B": { "A": 29, "C": 21, "E": 5, "F": 3},
+    "C": { "B": 21, "D": 12, "F": 17 },
+    "D": { "A": 7, "C": 12, "E": 15},
+    "E": { "B": 5, "F": 18},
+    "F": {"B": 3, "C": 17, "E": 18},
+  }
+
+  start = "A"
+  endNode = "F"
+  currentNode = start
+  route = [start]
+  totalCost = 0
+  visited = new Set() // Set for unique values only, makes sense for this - Array or similar if not available
+
+  visited.add(start)
+
+  // Just redundancy check if start and end is the same
+  if (start == endNode) {
+  return {
+    success: true,
+    message: "Start and end are the same node",
+    totalWeight: 0,
+    route: [start]
+  }
+}
+
+  while (currentNode != endNode) {
+    minWeight = Infinity 
+    nextNode = null
+
+    // Look at the neighbors in the currentNode
+    for (neighbor in graph[currentNode]) {
+      // skip if already visited
+      if (visited.has(neightbor)) continue
+
+      weight = graph[currentNode][neighbor]
+
+      if (weight < minWeight) {
+        minWeight = weight
+        nextNode = neightbor
+      }
+    }
+
+    // If there were no valid node -> return failure
+    if (nextNode == null) {
+      return {
+        "success": false,
+        "message": "Ran into a dead-end",
+        "totalCost": null,
+        "route": route
+      }
+    }
+
+    // Go to next node
+    route.push(nextNode)
+    totalCost += minWeight
+    visited.add(nextNode)
+    currentNode = nextNode
+  }
+
+  // Should have gotten to the end node at this point
+  return {
+    "success": true,
+    "message": "Greedy path found",
+    "totalCost": totalCost,
+    "route": route
+  }
+}
