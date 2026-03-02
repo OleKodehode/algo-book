@@ -49,7 +49,7 @@ function FractionalKnapsack(items, capacity) {
 
   // if for some reason there were no bestItem
   if (bestItem == null) {
-    return { totalValue: 0, totalUnits: 0, selected: null, message: "No Valid items" }
+    return { "totalValue": 0, "totalUnits": 0, "selected": null, "message": "No Valid items" }
   }
 
   // probably a good idea to limit how many decimals are in these variables
@@ -68,7 +68,7 @@ function FractionalKnapsack(items, capacity) {
         count: totalUnits.ToFixed(2)
       }
     },
-    message: "success"
+    "message": "success"
   }
 }
 
@@ -91,7 +91,7 @@ function ZeroOneKnapsack(items, capacity) {
     nextItem = candidates.pop() // Take the highest value item out
 
     if (capacityUsed + nextItem.weight <= capacity) {
-      key = nextItem.key || length(selected) + 1
+      key = nextItem.key || Object.keys(selected).length + 1
       selected[key] = {
         weight: nextItem.weight,
         value: nextItem.value,
@@ -141,7 +141,7 @@ function BoundedKnapsack(items, capacity){
 
     // skip item if we can't take any units
     if (takeCount > 0) { 
-      key = nextItem.key || length(selected) + 1
+      key = nextItem.key || Object.keys(selected).length + 1
       capacityUsed += takeCount * nextItem.weight
       totalValue += takeCount * nextItem.value
 
@@ -157,3 +157,48 @@ function BoundedKnapsack(items, capacity){
     "message": "success"
   }
 }
+
+function UnboundedKnapsack(items, capacity) {
+  capacityUsed = 0 // Keep track of how much is used
+  candidates = [] // for making a copy of items
+  totalValue = 0 // Keeping track of total value for the return object
+  selected = {}
+
+  foreach (item in items) {
+    // skip invalid items - Items with no weight, no value or weight above capacity
+    if (item.weight > capacity || item.weight <= 0 || item.value <= 0) { continue } 
+    candidates.push({...item, ratio: item.value / item.weight})
+  }
+
+  // Ascending sort for pop in while loop
+  candidates.sort((a,b) => a.ratio - b.ratio)
+
+   while (capacityUsed < capacity && candidates.length > 0) {
+    nextItem = candidates.pop()
+
+    if (capacity - capacityUsed < nextItem.weight) continue
+
+    // Since there is no limit on each object, take as many as possible (full units only)
+    takeCount = floor((capacity - capacityUsed) / nextItem.weight) // take as many items we can without going over the limit
+
+    // skip item if we can't take any units
+    if (takeCount > 0) { 
+      key = nextItem.key || Object.keys(selected).length + 1
+      capacityUsed += takeCount * nextItem.weight
+      totalValue += takeCount * nextItem.value
+
+      // add the item and the amount taken
+      selected[key] = { weight: nextItem.weight, value: nextItem.value, count: takeCount }
+    }
+  }
+
+  return {
+    "totalValue": totalValue,
+    "capacityUsed": capacityUsed,
+    "selected": selected,
+    "message": "success"
+  }
+}
+
+// ------------ End of KnapSack ------------
+
