@@ -355,25 +355,82 @@ graph = {
   "E": { "C": 6, "D": 14, "G": 10},
   "F": { "C": 17, "G": 12},
   "G": { "D": 16, "E": 10, "F": 12, "H": 7},
-  "H": { "D": 5, "H": 7},
+  "H": { "D": 5, "G": 7},
 }
 
-// Function should take in a weighted graph and return a minimum spanning tree instead of a graph
+// Function should take in a weighted graph and return a minimum spanning tree instead of a graph. Quite similar to shortest path
 function PrimDijkstraTree(graph) {
-  // Choose starting node, declare it as part of the tree
+  start = "A" // Just sticking with the first for now, as we know the graph.
+  visited = new Set() // some kind of lookup object/array of visited nodes - Set like in JS enforces only unique values
+  parent = {}
+  connections = {}
 
-  // From all edges connected to the tree, find an edge with the smallest weight. Choose that edge to join the tree.
+  for (node in graph) {
+    connections[node] = Infinity
+    parent[node] = null
+  }
 
-  // Find all nodes connected by all edges in the tree, add those nodes into the tree
+  connections[start] = 0
+  visited.add(start)
 
-  // Check all the other edges that have not joined the tree, if both nodes connected by an edge is already part of the tree
+  mstEdges = [] // minimum spanning tree edges
+  totalCost = 0
+  // Check the branches of every node added to visited and add them to the set until the size matches the size of the graph
+  while (visited.size < Object.keys(graph).length) {
+    minWeight = Infinity
+    nextNode = null
+    fromNode = null
+    
+    // Update the weight cost of connections based on visited.
+    for (node in visited) {
+      for (neighbor in graph[node]) {
+        if (visited.has(neighbor)) continue
 
-  // mark the edge so that it will not be selected to join the tree.
+        weight = graph[node][neighbor]
+        if (!visited.has(neighbor) && weight < connections[neighbor]) {
+          connections[neighbor] = weight;
+          parent[neighbor] = node;
+        }
+      }
+    }
 
-  // repeat until all nodes are part of the tree.
+    // A bit unoptimal - Optimize this as needed. 
+    // Go through each node in the graph
+    // if it's not in visited, and the weight in connections is less than minWeight then replace it.
+    for (node in graph) {
+      if (!visited.has(node) && connections[node] < minWeight) {
+        minWeight = connections[node]
+        nextNode = node
+        fromNode = parent[node]
+      }
+    }
+    // In case of errors
+    if (nextNode == null) {
+      return {
+        "success": false,
+        "message": "Invalid graph",
+        "totalCost": null,
+        "edges": mstEdges,
+        "visitedCount": visited.size
+      }
+    }
 
-  // return http like JSON object
-  
+    visited.add(nextNode)
+    mstEdges.push({
+      from: fromNode,
+      to: nextNode,
+      weight: minWeight
+    })
+    totalCost += minWeight
+  }
+
+  return {
+    "success": true,
+    "message": "MST found - Greedy Prim",
+    "totalCost": totalCost,
+    "edgeCount": mstEdges.length,
+    "edges": mstEdges
+  }
 }
 
 function KruskalTree(graph) {
