@@ -289,7 +289,7 @@ function ShortestPath() {
   currentNode = start
   route = [start]
   totalCost = 0
-  visited = new Set() // Set for unique values only, makes sense for this - Array or similar if not available
+  visited = new Set() // Set for unique values only - Array or similar if not available
 
   visited.add(start)
 
@@ -344,4 +344,38 @@ function ShortestPath() {
     "totalCost": totalCost,
     "route": route
   }
+}
+
+// Minimum Spanning Tree
+graph = {
+  "A": { "B": 11, "C": 9, "D": 15},
+  "B": { "A": 11, "D": 8},
+  "C": { "A": 9, "D": 4, "E": 6, "F": 17},
+  "D": { "A": 15, "B": 8, "C": 4, "E": 14, "G": 16, "H": 5},
+  "E": { "C": 6, "D": 14, "G": 10},
+  "F": { "C": 17, "G": 12},
+  "G": { "D": 16, "E": 10, "F": 12, "H": 7},
+  "H": { "D": 5, "H": 7},
+}
+
+// Function should take in a weighted graph and return a minimum spanning tree instead of a graph
+function PrimDijkstraTree(graph) {
+  // Choose starting node, declare it as part of the tree
+
+  // From all edges connected to the tree, find an edge with the smallest weight. Choose that edge to join the tree.
+
+  // Find all nodes connected by all edges in the tree, add those nodes into the tree
+
+  // Check all the other edges that have not joined the tree, if both nodes connected by an edge is already part of the tree
+
+  // mark the edge so that it will not be selected to join the tree.
+
+  // repeat until all nodes are part of the tree.
+
+  // return http like JSON object
+  
+}
+
+function KruskalTree(graph) {
+
 }
