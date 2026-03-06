@@ -42,7 +42,7 @@ def prim_mst(graph: Dict[str, Dict[str, int]], start: str = "A") -> dict:
             if name not in visited and weight < connections[name]:
                connections[name] = weight
                parent[name] = node
-               print(f"Update to connection weights: {name} = {connections[name]}")
+               # print(f"Update to connection weights: {name} = {connections[name]}")
                
       # A bit unnecessary to loop over the graph every iteration - This is done for simplicity for now
       # Probably better to keep a set/list of candidates as an intermediate step and loop over those         
@@ -51,7 +51,7 @@ def prim_mst(graph: Dict[str, Dict[str, int]], start: str = "A") -> dict:
             min_weight = connections[node]
             next_node = node
             from_node = parent[node]
-            print(f"Choosing {node} for potential candidate")
+            # print(f"Choosing {node} for potential candidate")
 
       # No more nodes reachable -> Disconnected graph
       if next_node is None:
@@ -72,8 +72,8 @@ def prim_mst(graph: Dict[str, Dict[str, int]], start: str = "A") -> dict:
       })
       total_cost += min_weight
 
-      print(f"added {next_node} to visited.\nCurrent edges: {mst_edges}")
-      print(f"Iteration {iterations} done - Next iteration\n")
+      # print(f"added {next_node} to visited.\nCurrent edges: {mst_edges}")
+      # print(f"Iteration {iterations} done - Next iteration\n")
 
   return {
      "success": True,

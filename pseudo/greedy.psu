@@ -434,5 +434,5 @@ function PrimDijkstraTree(graph) {
 }
 
 function KruskalTree(graph) {
-
+  
 }
