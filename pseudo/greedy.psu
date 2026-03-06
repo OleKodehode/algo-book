@@ -518,3 +518,24 @@ function KruskalTree(graph) {
     "edgeCount": mstEdges.length
   }
 }
+
+// {Node1 [ connection1, connection2, ... ], Node2 [ ... ], ... }
+colorGraph = {
+  "A": ["B", "E", "H"],
+  "B": ["A", "C", "H"],
+  "C": ["B", "D", "H"],
+  "D": ["C", "H"],
+  "E": ["A", "F", "G", "H"],
+  "F": ["E", "G"],
+  "G": ["E", "F", "H", "I", "K"],
+  "H": ["A", "B", "C", "D", "E", "G", "I", "J", "L", "M"],
+  "I": ["G", "H", "K", "J"],
+  "J": ["H", "I", "L"],
+  "K": ["G", "I", "L"],
+  "L": ["H", "I", "K", "J", "M"],
+  "M": ["H", "L"],
+}
+
+function graphColoring(graph) {
+  colors = ["red", "yellow", "green", "blue"]
+}
