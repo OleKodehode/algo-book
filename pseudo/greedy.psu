@@ -434,5 +434,87 @@ function PrimDijkstraTree(graph) {
 }
 
 function KruskalTree(graph) {
-  
+  edges = []
+  for (node in graph) {
+    for (connection in graph[node]) {
+      // Only need one direction, alphabetic. A -> B, no need for B -> A
+      if (node < connection) {
+        edges.push({
+          "from": node,
+          "to": connection,
+          "weight": graph[node][connection]
+        })
+      }
+    }
+  }
+
+  // sort by weight
+  edges.sort((a,b) => a.weight - b.weight)
+
+  parent = {}
+  rank = {}
+  for (node in graph) {
+    parent[node] = node
+    rank[node] = 0
+  }
+
+  function find(x) {
+    if (parent[x] != x) {
+      parent[x] = find(parent[x]) // Path Compression
+    }
+    return parent[x]
+  }
+
+  function union(x, y) {
+    px = find(x)
+    py = find(y)
+
+    if (px == py) return false
+
+    // union by rank
+    if (rank[px] < rank[py]) {
+      parent[px] = py
+    } else if (rank[px] > rank[py]) {
+      parent[py] = px
+    } else {
+      parent[py] = px
+      rank[px] += 1
+    }
+
+    return true
+  }
+
+  // Building of the tree
+  // the length of the mstEdges should be number of nodes - 1
+  mstEdges = []
+  totalCost = 0
+
+  for (edge of edges) {
+    if(union(edge.from, edge.to)) {
+      mstEdges.push(edge);
+      totalCost += edge.weight
+    }
+    // early stop
+    if (mstEdges.length == Object.keys(graph).length - 1) {
+      break
+    }
+  }
+
+  if (mstEdges.length != Object.keys(graph).length - 1) {
+    return {
+      "success": false,
+      "message": "Invalid Graph",
+      "totalCost": null,
+      "edges": mstEdges,
+      "edgeCount": mstEdges.length
+    }
+  }
+
+  return {
+    "success": true,
+    "message": "MST Found - Greedy Kruskal",
+    "totalCost": totalCost,
+    "edges": mstEdges,
+    "edgeCount": mstEdges.length
+  }
 }
