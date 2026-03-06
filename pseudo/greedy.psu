@@ -538,4 +538,11 @@ colorGraph = {
 
 function graphColoring(graph) {
   colors = ["red", "yellow", "green", "blue"]
+
+  // For each node, count how many edges
+  // Sort nodes in descending order - Highest amount of edges first
+  // Assign first color to the node with the highest amount first.
+  // Any node connected to that color is ruled out - Continue to the next highest node
+  // continue until there are no nodes left able to accept that color
+  // go to next color and repeat
 }
