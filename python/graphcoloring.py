@@ -103,6 +103,7 @@ color_graph = {
 }
 
 if __name__ == "__main__":
+  # comment/uncomment the one to show
   #result = bookApproach(color_graph)
   result = single_pass_coloring(color_graph)
 
