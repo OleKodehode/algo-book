@@ -1,0 +1,73 @@
+/*
+* The dynamic programming chapter starts with the fibonacci sequence
+* It does over a basic one first, and implement several optimizations
+* in separate psuedocode blocks to show off the difference
+*/
+
+function Fibo1(n) {
+  if (n == 1 || n == 2 ) {
+    result = n-1
+  } else if (n > 2) {
+    result = Fibo1(n-1) + Fibo1(n-2)
+  }
+
+  return result
+}
+
+for (i = 1 to 50) {
+  print Fibo1(i)
+}
+
+// The above quickly reaches a huge amount of recursive calls
+// Needing about 69 billion func calls for the first 50 numbers
+
+// Fibo with memoisation
+function Fibo2(n) {
+  // memo is a global array
+
+  if (n == 1 || n == 2) {
+    result = n - 1
+  } else if ( n > 2 ) {
+    if (memo[n-1] == 0) memo[n-1] = Fibo2(n-1)
+    if (memo[n-2] == 0) memo[n-2] = Fibo2(n-2)
+
+    memo[n] = memo[n-1] + memo[n-2]
+    result =  memo[n]
+  }
+
+  return result
+}
+
+// fill an array with zeros first
+memo = array.zeroFill(50)
+
+for (i = 1 to 50) {
+  print(Fibo2(i))
+}
+
+// the above requires significantly less func calls
+
+// bottom up memoisation
+// Clean slate - 1-indexing:
+memo[1] = 1
+memo[2] = 1
+print(memo[1], memo[2])
+for (i = 3 to 50) {
+  memo[i] = memo[i-1] + memo[i-2]
+  print(memo[i])
+}
+
+// Requires more memory space
+
+// Improved: No array
+
+numb1 = 1
+numb2 = 1
+print(numb1, numb2)
+for (i = 3 to 50 ) {
+  next = numb1 + numb2
+  print(next)
+  numb2 = numb1
+  numb1 = next
+}
+
