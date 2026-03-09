@@ -536,13 +536,141 @@ colorGraph = {
   "M": ["H", "L"],
 }
 
-function graphColoring(graph) {
+// From the book itself
+function graphColoringBook(graph) {
   colors = ["red", "yellow", "green", "blue"]
 
   // For each node, count how many edges
+  connections = {}
+  for (node in graph) {
+    connections[node] = graph[node].length
+  }
+
   // Sort nodes in descending order - Highest amount of edges first
-  // Assign first color to the node with the highest amount first.
-  // Any node connected to that color is ruled out - Continue to the next highest node
-  // continue until there are no nodes left able to accept that color
-  // go to next color and repeat
+  sortedNodes = Object.keys(graph)
+  sortedNodes.sort((a,b) => connections[b] - connections[a])
+
+  nodeColor = {}
+  for (node in graph) {
+    nodeColor[node] = null
+  }
+
+  colorIndex = 0
+
+  while(true) {
+    activeColor = colors[colorIndex]
+
+    madeAssignment = false
+
+    // Assign first color to the node with the highest amount first.
+    for (node of sortedNodes) {
+      if (nodeColor[node] != null) continue // Already colored -> skip
+
+      safe = true
+      // Check neighbors for the same color
+      // Any node connected to that color is ruled out - Continue to the next highest node
+      for (neighbor of graph[node]) {
+        if (nodeColor[neighbor] === activeColor) {
+          safe = false
+          break
+        }
+      }
+
+      if (safe) {
+        nodeColor[node] = activeColor
+        madeAssignment = true
+      }
+    }
+    // continue until there are no nodes left able to accept that color
+
+    colorIndex++
+
+    allColored = true
+    for (node in nodeColor) {
+      if (nodeColor[node] == null) {
+        allColored = false
+        break
+      }
+    }
+
+    if (allColored) break
+
+    // Check if we don't have enough colors
+    if (colorIndex >= colors.length) {
+      colors.push("color" + (colorIndex + 1))
+    }
+    // go to next color and repeat
+
+  }
+
+  return {
+    "success": true,
+    "message": "Graph Colored. (Book's welsh-powell style)",
+    "coloring": nodeColor,
+    "colorsUsed:" [...new Set(Object.values(nodeColor))],
+    "colorAmount": new Set(Object.values(nodeColor)).size,
+  }
+}
+
+// Single pass more optimized function
+function WelshPowellColoring(graph) {
+  // Extend if needed
+  colors = ["red", "yellow", "green", "blue", "purple", "orange", "pink", "brown"]
+
+  // Check how many connections there are for each node
+  connections = {}
+  for (node in graph) {
+    connections[node] = graph[node].length
+  }
+
+  // Sort the nodes in descending order
+  sortedNodes = Object.keys(graph)
+  sortedNodes.sort((a,b) => connections[b] - connections[a])
+
+  // Track assigned colors for each node
+  nodeColor = {}
+  for (node in graph) {
+    nodeColor[node] = null
+  }
+
+  // Color each node
+  for (node of sortedNodes) {
+    // find forbidden colors -> Colors used by neighbors
+    forbidden = new Set()
+
+    for (neighbor of graph[node]) {
+      if (nodeColor[neighbor] != null) {
+        forbidden.add(nodeColor[neighbor])
+      }
+    }
+
+    // Assign the lowest index color not in forbidden
+    for (color of colors) {
+      if (!forbidden.has(color)) {
+        nodeColor[node] = color
+        break
+      }
+    }
+
+    // Edge case check
+    // If we run out of available colors
+    if (nodeColor[node] == null) {
+      newColor = "color" + colors.length
+      colors.push(newColor)
+      nodeColor[node] = newColor
+    }
+  }
+
+  // Check how many colors were used
+  usedColors = new Set(Object.values(nodeColor))
+  colorAmount = usedColors.size
+
+  return {
+    "success": true,
+    "message": "Graph colored using greedy Wels-Powell",
+    "coloring": nodeColor,
+    "colorAmount": colorAmount,
+    "colorsUsed": usedColors,
+    "nodeOrder": sortedNodes,    
+  }
 }
