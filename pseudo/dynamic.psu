@@ -206,3 +206,22 @@ function PushTwo() {
 
   return "Min coins to make 23: ${arrC[23]}"
 }
+
+// ========= End of section ===========
+
+/*
+* Multistage Graph Problem.
+* Shortest path algo for a graph with specific critera:
+* Each of its edges has a direction. (Directed Graph)
+* Each of its edges has a weight. (Weighted graph)
+* it has exactly 1 source node.
+* it has exactly 1 sink node.
+* Path from source to sink have multiple stages (V1 to Vk)
+* Each edge connects to a node in Vi to a node in Vi+1 (1 <= i <= k)
+* it has 2 or more stages (k >= 2)
+* Each path from s to t is a consequence of k-1 choices.
+* Main formula: cost{x, i} = min{edge{x,y} + cost{y,i+1}}
+* cost{x,i} is the shorest path from node x in stage Vi to sink(t)
+* edge{x,y} is the weight of edge connecting nodes x and y
+* Calculations starts from nodes in stage k-2
+*/
