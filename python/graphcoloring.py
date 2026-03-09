@@ -55,6 +55,7 @@ def bookApproach(graph: Dict[str, List[str]]) -> dict:
     "node_order": sorted_nodes
   }
 
+# A slightly more performant version, using a single pass rather than while loop
 def single_pass_coloring(graph: Dict[str, List[str]]) -> dict:
   colors = ["red", "yellow", "green", "blue", "purple", "orange", "brown"] # extend as needed
 
