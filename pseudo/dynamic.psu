@@ -220,8 +220,17 @@ function PushTwo() {
 * Each edge connects to a node in Vi to a node in Vi+1 (1 <= i <= k)
 * it has 2 or more stages (k >= 2)
 * Each path from s to t is a consequence of k-1 choices.
+*
+* Forward technique:
 * Main formula: cost{x, i} = min{edge{x,y} + cost{y,i+1}}
 * cost{x,i} is the shorest path from node x in stage Vi to sink(t)
 * edge{x,y} is the weight of edge connecting nodes x and y
 * Calculations starts from nodes in stage k-2
+*
+* Backward technique:
+* bcost{x,y} = min{bcost{x,i-1}+edge{y,x}}
+* bcost{x,i} is the shortest path length from source node to node x in stage Vi
+* edge{y,x} is the weight of the edge connecting nodes y and x
+* 
 */
+
