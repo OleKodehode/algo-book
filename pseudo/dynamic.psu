@@ -131,7 +131,7 @@ function PushOne() {
 
   // Main Loop
   for (i = 1 to iArraySize) {
-    if (arrC[i] == 1) {
+    if (arrC[i] == "Y") {
       for (j = 1 to iNumOfCoins) {
         if (i + coin[j] <= iArraySize) {
           if (arrC[i + coin[j]] == "N") {
@@ -168,7 +168,7 @@ function PullTwo() {
       index = i - coin[j]
 
       if (index >= 1 && arrC[index] > 0) {
-        if (arrC[i]=0 || arrC[i] > arrC[index] + 1) {
+        if (arrC[i]==0 || arrC[i] > arrC[index] + 1) {
           arrC[i] = arrC[index] + 1
         }
       }
@@ -197,7 +197,7 @@ function PushTwo() {
       index = i + coin[j]
 
       if (index <= iArraySize && arrC[i]>0) {
-        if (arrC[index] = 0 || arrC[index] > arrC[i] + 1) {
+        if (arrC[index] == 0 || arrC[index] > arrC[i] + 1) {
           arrC[index] = arrC[i] + 1
         } 
       }
