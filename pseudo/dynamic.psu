@@ -220,6 +220,7 @@ function PushTwo() {
 * Each edge connects to a node in Vi to a node in Vi+1 (1 <= i <= k)
 * it has 2 or more stages (k >= 2)
 * Each path from s to t is a consequence of k-1 choices.
+* The book covers forward and backwards techniques.
 *
 * Forward technique:
 * Main formula: cost{x, i} = min{edge{x,y} + cost{y,i+1}}
