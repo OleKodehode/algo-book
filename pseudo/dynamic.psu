@@ -71,3 +71,136 @@ for (i = 3 to 50 ) {
   numb1 = next
 }
 
+/* Coin Change problem
+* The book covers the coin change problem using 3 coins.
+* Values: $3, $5, $12.
+* Can someone give change of $23 using those coins?
+* How many coins minimum is needed?
+* The book covers 4 different methods of answering that.
+*/
+
+iArraySize = 25
+iNumOfCoins = 3
+coin[1] = 3 // book uses 1-indexing
+coin[2] = 5
+coin[3] = 12
+
+// Pull technique #1
+// Can X be given?
+function PullOne() {
+  arrC = []
+
+  for (i = 1 to iArraySize) {
+    arrC[i] = "N"
+  }
+  for (i = 1 to iNumOfCoins) {
+    arrC[coin[i]] = "Y"
+  }
+
+  // Main Loop
+  for (i = 1 to iArraySize) {
+    for (j =1 to iNumOfCoins) {
+      if (i - coin[j] >= 1) {
+        if (arrC[i - coin[j]] == "Y") {
+          arrC[i] = "Y"
+        }
+      }
+    }
+  }
+
+  if (arrC[23] == "Y") {
+    return "Value 23 can be given"
+  }
+
+  return "Value 23 can't be given"
+}
+
+// Push Technique #1
+// Can x be given?
+function PushOne() {
+  arrC = []
+
+  for (i = 1 to iArraySize) {
+    arrC[i] = "N"
+  }
+  for (i = 1 to iNumOfCoins) {
+    arrC[coin[i]] = "Y"
+  }
+
+  // Main Loop
+  for (i = 1 to iArraySize) {
+    if (arrC[i] == 1) {
+      for (j = 1 to iNumOfCoins) {
+        if (i + coin[j] <= iArraySize) {
+          if (arrC[i + coin[j]] == "N") {
+            arrC[i + coin[j]] = "Y"
+          }
+        }
+      }
+    }
+  }
+
+  if (arrC[23] == "Y") {
+    return "Value 23 can be given"
+  }
+
+  return "Value 23 can't be given"
+}
+
+// Pull Technique #2
+// Minimum number of coins to make x
+function PullTwo() {
+  arrC = []
+
+  for (i = 1 to iArraySize) {
+    arrC[i] = 0
+  }
+
+  for (i = 1 to iNumOfCoins) {
+    arrC[coin[i]] = 1
+  }
+
+  // main loop
+  for (i = 1 to iArraySize) {
+    for (j = 1 to iNumOfCoins) {
+      index = i - coin[j]
+
+      if (index >= 1 && arrC[index] > 0) {
+        if (arrC[i]=0 || arrC[i] > arrC[index] + 1) {
+          arrC[i] = arrC[index] + 1
+        }
+      }
+    }
+  }
+
+  return "Min coins to make 23: ${arrC[23]}"
+}
+
+// Push Technique #2
+// Minimum number of coins to make X
+function PushTwo() {
+  arrC = []
+
+  for (i = 1 to iArraySize) {
+    arrC[i] = 0
+  }
+
+  for (i = 1 to iNumOfCoins) {
+    arrC[coin[i]] = 1
+  }
+
+  // main loop
+  for (i = 1 to iArraySize) {
+    for (j = 1 to iNumOfCoins) {
+      index = i + coin[j]
+
+      if (index <= iArraySize && arrC[i]>0) {
+        if (arrC[index] = 0 || arrC[index] > arrC[i] + 1) {
+          arrC[index] = arrC[i] + 1
+        } 
+      }
+    }
+  }
+
+  return "Min coins to make 23: ${arrC[23]}"
+}
