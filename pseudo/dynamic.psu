@@ -71,6 +71,8 @@ for (i = 3 to 50 ) {
   numb1 = next
 }
 
+// ============ New Section ============
+
 /* Coin Change problem
 * The book covers the coin change problem using 3 coins.
 * Values: $3, $5, $12.
