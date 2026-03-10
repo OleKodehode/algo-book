@@ -221,6 +221,7 @@ function PushTwo() {
 * it has 2 or more stages (k >= 2)
 * Each path from s to t is a consequence of k-1 choices.
 * The book covers forward and backwards techniques.
+* However the book didn't supply any psuedocode for this.
 *
 * Forward technique:
 * Main formula: cost{x, i} = min{edge{x,y} + cost{y,i+1}}
@@ -382,3 +383,100 @@ function multistageBackward(graph, stages, source, sink) {
     "path": path
   }
 }
+
+// ========= End of section ===========
+
+/*
+* 0/1 knapsack problem (Dynamic programming rather than greedy)
+* The book supplied psuedocode for this
+*/
+
+/*
+* The book uses this example:
+* n = 4
+* Wmax = 6
+* (v1, v2, v3, v4) = (6, 5, 9, 8)
+* (w1, w2, w3, w4) = (3, 2, 5, 4)
+*/
+items = [6,5,9,8]
+weights = [3,2,5,4]
+function dynamicKnapsack(items, weights, maxWeight) {
+  numItems = length(items) // number of items
+  matrix = new Array(numItems + 1) // 2D table - matrix[i][w] - i = items, w = weight
+
+  // Init
+  for (i = 0 to numItems)  { // Range of
+    matrix[i][0] = 0
+  }
+  for (w = 0 to maxWeight) {
+    matrix[0][w] = 0
+  }
+
+  // book uses 1-indexing
+  for (i = 1 to numItems) {
+    for (w = 0 to maxWeight) {
+      if (weights[i-1] <= w) { 
+        without = matrix[i-1][w]
+        with = items[i-1] + matrix[i-1][w - weights[i-1]]
+        matrix[i][w] = max(without, with)
+        } else {
+        matrix[i, w] = matrix[i-1, w]
+      }
+    }
+  }
+
+  // Find which items were takenm
+  selected = []
+  i = numItems
+  w = maxWeight
+
+  while(i > 0 && w > 0) {
+    if (matrix[i][w] != matrix[i-1][w]) {
+      selected.push(i)
+      w = w - weights[i-1]
+    }
+    i = i - 1
+  }
+
+  // total value
+  totalValue = matrix[numItems][maxWeight]
+
+  return {
+    "success": true,
+    "maxValue": totalValue,
+    "selectedItems": selected.reverse(), // reversed to get in order 1 -> n
+    "table": matrix
+  }
+}
+
+// Directly from the book below:
+n = 4
+Wmax = 6
+(v1, v2, v3, v4) = (6,5,9,8)
+(w1,w2,w3,w4) = (3,2,5,4)
+for i = 1 to n do
+  K[i,0] = 0
+end for
+for j = 0 to wMax do
+  K[0,j] = 0
+end for
+for i = 1 to n do
+  for j = 1 to Wmax do
+    if w[i] <= j do
+      if v[i] + k[i-1, j-w[i]] > K[i-1,j] do
+        k[i,k] = v[i] + K[i-1,j-w[i]]
+      else
+        K[i,j] = K[i-1,j]
+      end if
+    else
+      K[i,j] = K[i-1,j]
+    end if
+  end for 
+end for
+while K[i,j]>0 do
+  if K[i,j] > K[i-1,j] do
+    add item #i to knapsack
+    j = j-w[i]
+  end if
+  i = i -1
+end while
