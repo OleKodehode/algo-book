@@ -235,3 +235,150 @@ function PushTwo() {
 * 
 */
 
+graph = {
+  "A": {"B": 7, "C": 6, "D": 5, "E": 9}, // V1
+  "B": {"F": 4, "G": 8, "H": 11},       // V2
+  "C": {"F": 10, "G": 3},               // V2
+  "D": {"H": 9},                        // V2
+  "E": {"G": 6, "H": 12},               // V2
+  "F": {"I": 12, "J": 9},               // V3
+  "G": {"I": 5, "J": 7},                // V3
+  "H": {"J": 10, "K": 8},               // V3
+  "I": {"L": 7},                        // V4
+  "J": {"L": 8},                        // V4
+  "K": {"L": 11},                       // V4
+  "L": {},                              // V5
+}
+
+stages = {
+  1: ["A"], // Source
+  2: ["B", "C", "D", "E"],
+  3: ["F", "G", "H"],
+  4: ["I", "J", "K"],
+  5: ["L"], // Sink
+}
+
+// Forward (cost to sink)
+function multistageForward(graph, stages, source, sink) {
+  cost = {} // stores node, the minimum cost to sink
+  next = {} // The best next node
+
+  // Initialize
+  for (stage of stages) {
+    for (node of stages[stage]) {
+      cost[node] = Infinity
+      next[node] = null
+    }
+  }
+
+  cost[sink] = 0
+
+  // Backward pass: From the penultimate node to start
+  // In this case, from stage 4 back to stage 1.
+  numStages = Object.keys(stages).length
+
+  // Set the iterator to max stages minus 1a
+  // Do one iteration as long as the iterator is greater than or equal to 1
+  // decrement stage by 1 after each iteration.
+  for (s = numStages - 1; s >= 1; s--) {
+    for (node of stages[s]) {
+      minCost = Infinity
+      bestVertex = null
+
+      for (vertex in graph[node]) {
+        weight = graph[node][vertex]
+        candidate = weight + cost[vertex]
+        if (candidate < minCost) {
+          minCost = candidate
+          bestVertex = vertex
+        }
+      }
+
+      if (minCost != Infinity) {
+        cost[node] = minCost
+        next[node] = bestVertex
+      }
+    }
+  }
+
+  if (cost[source] == Infinity) {
+    return {
+      "success": false,
+      "message": "No path",
+      "minCost": null,
+      "path": [],
+    }
+  }
+
+  // Reconstruct path
+  path = []
+  current = source
+  while (current != null) {
+    path.push(current)
+    current = next[current]
+  }
+
+  return {
+    "success": true,
+    "minCost": cost[source],
+    "path": path
+  }
+}
+
+// Backward (cost from source to each node)
+function multistageBackward(graph, stages, source, sink) {
+  dist = {} // Stores nodes and the minimum cost from source to node
+  prev = {} // For Path reconstruction
+
+  // initialize
+  for (stage in stages) {
+    for (node of stages[stage]) {
+      dist[node] = Infinity
+      prev[node] = null
+    }
+  }
+
+  dist[source] = 0
+
+  // Forward pass: stage 1 to last.
+  // In this case, from stage 1 (A) to stage 5 (L)
+  numStages = Object.keys(stages).length
+  for (s = 1; s <= numStages; s++) {
+    for (node of stages[s]) {
+      if (dist[node] == Infinity) continue
+
+      for (vertex in graph[node]) {
+        weight = graph[node][vertex]
+        newDist = dist[node] + weight
+
+        if (newDist < dist[vertex]){
+          dist[vertex] = newDist
+          prev[vertex] = node
+        }
+      }
+    }
+  }
+
+  if (dist[sink] == Infinity) {
+    return {
+      "success": false,
+      "message": "No path",
+      "minCost": null,
+      "path": []
+    }
+  }
+
+  // Path Reconstruction
+  path = []
+  current = sink
+  while (current != null) {
+    path.unshift(current)
+    current = prev[current]
+  }
+
+  return {
+    "success": true,
+    "minCost": dist[sink],
+    "path": path
+  }
+}
