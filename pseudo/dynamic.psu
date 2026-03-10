@@ -480,3 +480,29 @@ while K[i,j]>0 do
   end if
   i = i -1
 end while
+
+// ========= End of section ===========
+
+/*
+* Traveling salesman problem
+* The book doesn't provide any psuedocode for this section.
+* Main formula: p(i,L) = min[c(j,i)+p(j,L-{j})]
+* p(i,L) is the cost from start node to node i after visiting nodes in list L.
+* c(j,i) is the cost from node j to i, and is not the same as c(i,j) because of directed edges.
+* L-{j} is list L without node j.
+* 
+* The book gives this example graph:
+* [inf  12    11    16]
+* [15   inf   15    10]
+* [8    14    inf   18]
+* [9    11    17   inf]
+* solution for the above is p{A, {B,C,D}} (cost 44)
+*
+* The book also gives this example graph:
+* [inf  9    inf     6]
+* [8    inf   16    12]
+* [14   15    inf   18]
+* [7    11    19   inf]
+* cost 47
+*/
+
