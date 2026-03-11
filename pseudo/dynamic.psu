@@ -506,3 +506,72 @@ end while
 * cost 47
 */
 
+// Held-karp Dynamic Programming algo - should work fine until
+// around 20 cities, becomes a lot slower after that.
+// NP-Hard, time: O(n^2 * 2^n), space: O(n * 2^n)
+function TSP(graph) {
+  n = length(nodes) + 1 // total cities including start
+
+  dp = new Array(1 << n)  // 2^n rows
+
+  for mask = 0 to (1 << n) - 1 {
+    dp[mask] = new Array(n)
+    for i = 0 to n-1 {
+      dp[mask][i] = Infinity
+    }
+  }
+
+  // Base case: From start to each city.
+  for i = 1 to n-1 { // Skip start
+    dp[1 << i][i] = graph[start][nodes[i]]  // Directed edge from start
+  }
+
+  // filling out the DP table
+  for mask = 0 to (1 << n) - 1 {
+    for u = 0 to n-1 {
+      if ((mask & (1 << u)) == 0) continue
+
+      for v = 0 to n-1 {
+        if ((mask & (1 << v)) != 0) continue
+        if (graph[nodes[u]][nodes[v]] == inf) continue
+        
+        prevMask = mask ^ (1 << v)
+        candidate = dp[prevMask][u] + graph[nodes[u]][nodes[v]]
+
+        if (candidate < dp[mask][v]) {
+          dp[mask][v] = candidate
+        } 
+      }
+    }
+  }
+
+  // Final step: Return to start from each possible last city
+  fullMask = (1 << n) - 1
+  minCost = Infinity
+  lastCity = -1
+
+  for i = 0 to n-1 {
+    if (i == startIndex) continue
+
+    candidate = dp[fullMask][i] + graph[nodes[i]][start]
+    if (candidate < minCost) {
+      minCost = candidate
+      lastCity = i
+    }
+  }
+
+  if (minCost == Infinity) {
+    return { 
+      "success": False,
+      "message": "TSP Fail"
+    }
+  }
+
+  // Optional reconstruction of path
+
+  return {
+    "success": True,
+    "minCost": minCost,
+    "tourLength": minCost
+  }
+}
