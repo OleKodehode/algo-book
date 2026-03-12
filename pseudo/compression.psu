@@ -1,0 +1,109 @@
+/*
+* The book contains a small chapter on Huffman coding, or compression. 
+* It doesn't contain any psuedocode itself for the algorithm. 
+* But does explain the process in good detail at least.
+*
+* Huffman Algorithm uses binary tree for encoding,
+* and has become the foundation for many compression algorithms.
+* (Music/MP3, Images/JPEG, general compression/zip)
+*/
+
+/*
+* The book uses "PROGRAMMING ALGORITHM BOOK" as an example string.
+* Using ASCII/latin-1 encoding, that string requires 208 bits (26 * 8).
+* The algorithm should compress that down to 95 bits.
+*/
+
+// Binary tree is needed, so creating a Node class is probably the best approach
+// Null in this.char for internal nodes (nodes that contain other nodes)
+class Node {
+  constructor(char, freq) {
+    this.char = char 
+    this.freq = freq
+    this.left = null
+    this.right = null
+  }
+}
+
+function Huffman(inputString) {
+  // Add in early checks to break out of execution if the input is invalid
+  if (!inputString || inputString.trim() == "") {
+    return {
+      "success": False,
+      "message": "Invalid input",
+    }
+  }
+  // Trim each side of the string of white space - Optional
+  str = inputString.trim()
+
+  // count the frequency of how many times each character appears in the string
+  freqMap = {}
+  for (char of str) { // If trim step skipped - replace str with inputString/your variable obviously
+    // if the character isn't in the map, then assign 0 + 1 to the character in the map, otherwise use the stored value + 1
+    freqMap[char] = (freqMap[char] || 0) + 1 
+  }
+
+  // Create a list of nodes using the freqmap variable
+  nodes = []
+  for (char in freqMap) {
+    nodes.push(new Node(char, freqMap[char]))
+  }
+
+  /* 
+  * Sort the list of characters based on frequencies (ascending order)
+  * Create a parent node and append the first 2 elements as child nodes to it
+  * Remove those elements from the list of characters and add the parent node to the list instead.
+  * Repeat until the list is empty (left with only 1 node - The root)
+  */
+  // priority queue with sort for small inputs - up to roughly 150-200 unique characters
+  while (nodes.length > 1) {
+    nodes.sort((a,b) => a.freq - b.freq)
+
+    // shift out the currently lowest frequency characters
+    left = nodes.shift()
+    right = nodes.shift()
+
+    // Create parent node - this.char to null as it contains other nodes
+    parent = new Node(null, left.freq + right.freq)
+    parent.left = left
+    parent.right = right
+    
+    // Put the parent node back into the list
+    nodes.push(parent) 
+  }
+
+  root = nodes[0] // Huffman tree root
+
+  // Binary code function
+  codes = {}
+  function generateCodes(node, current = "") {
+    if (!node) return
+
+    if (node.char !== null) { // Leaf node
+      codes[node.char] = current
+      return
+    }
+
+    generateCodes(node.left, current + "0")
+    generateCodes(node.right, current + "1")
+  }
+
+  generateCodes(root)
+
+  // encode the original string
+  encoded = ""
+  for (char of str) { // another place to change variable if you didn't trim at the start
+    encoded += codes[char]
+  }
+
+  return {
+    "success": True,
+    "message": "Compression successful",
+    "original": str,
+    "originalBits": str.length * 8,
+    "encoded": encoded,
+    "encodedBits": encoded.length,
+    "codes": codes,
+    "treeRoot": root
+  }
+}
