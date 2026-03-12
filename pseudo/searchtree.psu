@@ -1,0 +1,10 @@
+/*
+* The Search Tree chapter in the book goes over the N-queen problem with a few different variants.
+* Tree traversal with depth-first search (stack) and breadth-first search (queue)
+* Graph traversal with DFS and BFS
+* Backtracking 
+*
+* It also goes over the basic principles of Branch and Bound, using Reduced Cost Matrix on the Traveling Salesman Problem
+*
+* No Psuedocode available in the chapter - Need to construct my own again
+*/
