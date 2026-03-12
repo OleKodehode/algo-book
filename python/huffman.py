@@ -9,11 +9,11 @@ class Node:
     self.left = None # type: None | Node
     self.right = None # type: None | Node
     
-"""
-Huffman compression algorithm for string inputs
-Left some print statements commented - Used print statements to see the flow
-"""
 def huffman_compression(text: str) -> dict:
+  """
+  Huffman compression algorithm for string inputs.
+  [Left some print statements commented - Used print statements to see the flow]
+  """
   if not text or text.strip() == "":
     return {
       "success": False,
@@ -59,7 +59,10 @@ def huffman_compression(text: str) -> dict:
   codes = {}
   def generate(node: Node | None, current: str = ""):
     if node is None: return
-    codes[node.char] = current
+    # Only assign a code if it's a leaf (I.E a character and not a parent node)
+    if node is not None and len(node.char) == 1: # type: ignore
+      codes[node.char] = current
+      
     generate(node.left, current + "0")
     generate(node.right, current + "1")
     return
@@ -76,7 +79,7 @@ def huffman_compression(text: str) -> dict:
 
   return {
     "success": True,
-    "msg": "Compression successfull",
+    "msg": "Compression successful",
     "original": text,
     "originalBits": len(text) * 8,
     "encoded": encoded,
@@ -84,16 +87,55 @@ def huffman_compression(text: str) -> dict:
     "codes": codes,
   }
 
+def huffman_decompress(encoded: str, codes: dict[str, str]) -> str:
+  """
+  Decodes a huffman-encoded bitstring using the provided codes dictionary.
+  Returns the original text or raises a ValueError on invalid input
+  """
+
+  if not encoded:
+    return ""
+  if not codes:
+    raise ValueError("No huffman codes delivered.")
+  
+  # Reverse loopup: code -> character
+  code_to_char = {code: char for char, code in codes.items() if len(char) == 1}
+
+  result = []
+  current = ""
+
+  for bit in encoded:
+    current += bit
+    if current in code_to_char:
+      result.append(code_to_char[current])
+      current = ""
+  
+  if current:
+    raise ValueError(f"Invalid encoded string - Leftover bits: {current}")
+  
+  return "".join(result)
+
 
 if __name__ == "__main__":
-  text = "PROGRAMMING ALGORITHM BOOK"
-  result = huffman_compression(text)
+  test_texts = [
+    "PROGRAMMING ALGORITHM BOOK",
+    "Jobloop Kodehode Kurs",
+    "aaaaAAAAbbbbBBBBccccCCCC",
+    "this is a test with a few repeated letters. Also some symbols! =^-^="
+  ]
 
-  for line in result:
-    print(f"{line}:\n{result[line]}\n")
+  for text in test_texts:
+    print(f"\n{'='*20}\n")
+    print(f"input: {text!r}")
+    print(f"Input length: {len(text)*8} bits\n")
 
-  text = "Jobloop Kodehode Kurs"
-  result = huffman_compression(text)
+    result = huffman_compression(text)
+    encoded = result["encoded"]
+    codes = result["codes"]
 
-  for line in result:
-    print(f"{line}:\n{result[line]}\n")
+    decoded = huffman_decompress(encoded, codes)
+
+    print(f"Bitstring:\n{encoded}")
+    print(f"Encoded length: {len(encoded)} bits\n")
+    print(f"Decoded {decoded!r}")
+    print(f"Round-trip OK : {decoded == text}")
