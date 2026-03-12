@@ -53,9 +53,8 @@ def held_karp_tsp(graph:Dict[str, Dict[str, int]], start: str = "A") -> dict:
         mask_str = f"0b{mask:0{n_other}b}"
         shifted_str = f"0b{mask & (1 << next_city-1):0{n_other}b}"
         print(f"Mask: {mask_str} - prev city: {previous_city} - next city: {next_city}")
-        print(f"Checking mask & (1 << next_city-1): {shifted_str}")
         if mask & (1 << next_city-1):
-          print(f"{shifted_str} is true - Skipping")
+          print(f"{shifted_str} is already visisted - Skipping")
           continue # already visited
 
         edge_cost = graph[node_list[previous_city]].get(node_list[next_city], inf)
@@ -63,7 +62,7 @@ def held_karp_tsp(graph:Dict[str, Dict[str, int]], start: str = "A") -> dict:
           print(f"Edge cost is infinity - {edge_cost}")
           continue
 
-        print(f"Setting new mask using mask | (1 << next_city-1): {shifted_str}. Previous mask: {mask_str}")
+        print(f"Setting new mask using 'mask | (1 << next_city-1)': {shifted_str}. Previous mask: {mask_str}")
         new_mask = mask | (1 << next_city-1)
         new_cost = dp[mask][previous_city] + edge_cost
         if new_cost < dp[new_mask][next_city]:
@@ -79,7 +78,7 @@ def held_karp_tsp(graph:Dict[str, Dict[str, int]], start: str = "A") -> dict:
   last_city = -1
   mask_str = f"0b{full_mask:0{n_other}b}"
 
-  print(f"Checking the return to start from each possible last city with mask: {mask_str}")
+  print(f"\nChecking the return to start from each possible last city with mask: {mask_str}\n")
   for i in range(1, n_other + 1): # Last city can't be the start, or index 0
     edge_cost = graph[node_list[i]].get(start, inf)
     if edge_cost != inf:
@@ -87,7 +86,6 @@ def held_karp_tsp(graph:Dict[str, Dict[str, int]], start: str = "A") -> dict:
       if candidate < min_cost:
         min_cost = candidate
         last_city = i
-    print("Final fill loop done\n")
 
   # if a path can't be found
   if min_cost == inf:
@@ -95,9 +93,7 @@ def held_karp_tsp(graph:Dict[str, Dict[str, int]], start: str = "A") -> dict:
       "success": False,
       "message": "TSP Failed."
     }
-  
-  print(prev)
-  
+    
   # Path Reconstruction
   path = []
   current_mask = full_mask
