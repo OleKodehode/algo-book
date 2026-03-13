@@ -8,3 +8,223 @@
 *
 * No Psuedocode available in the chapter - Need to construct my own again
 */
+
+// N-Queen using 4x4 grid (n=4)
+
+class TreeNode {
+  constructor(value) {
+    this.value = value
+    this.left = null;
+    this.right = null;
+  }
+}
+
+// Depth-first search using stack [First in, last out]
+function DFSS(root) {
+  if (!root) return
+
+  // Push root node into the stack
+  stack = [root]
+  visited = []
+
+  while (stack.length > 0) {
+    // Pop node X from stack
+    node = stack.pop()
+
+    visisted.push(node.value)
+
+    // Push child nodes into stack (right in first -> left-to-right)
+    if (node.right) stack.push(node.right)
+    if (node.left) stack.push(node.left)
+  }
+
+  return visited
+}
+
+// Breadth-first using Queue [First in, first out]
+function BFSQ(root) {
+  if (!root) return
+
+  // Push root node into the queue
+  queue = [root]
+  visited = []
+
+  while (queue.length > 0) {
+    node = queue.shift() // Grab the first entry in the queue (first index)
+
+    visited.push(node.value)
+
+    // If that node has any child nodes, push all of them into the queue
+    // Left first -> left-to-right
+    if (node.left) queue.push(node.left)
+    if (node.right) queue.push(node.right)
+  }
+
+  return visited
+}
+
+// Depth-first search in graphs using stack [First in, last out]
+function DFSG(graph, start) {
+  if (!graph) return
+
+  stack = [start]
+  visited = new Set()
+  order = []
+
+  while (stack.length > 0) {
+    // Pop node X from stack
+    node = stack.pop()
+
+    // If that node is directly connected to an unprocessed node, push all those nodes into the stack and mark them as processed.
+    if (!visited.has(node)) {
+      visited.add(node)
+      order.push(node)
+
+      // Push unvisited neighbors - Reverser order for left-to-right
+      neighbors = graph[node] || []
+      for (i = neighbors.length - 1; i >= 0; i--) {
+        neighborNode = neighbors[i]
+        if (!visited.has(neighborNode)) {
+          stack.push(neighborNode)
+        }
+      }
+    }
+  }
+
+  return order
+}
+
+// Breadth-first search in graphs using queue [First in, first out]
+function BFSG(graph, start) {
+  queue = [start]
+  order = [start]
+  visited = new Set([start])
+
+  while (queue.length > 0) {
+    node = queue.shift() // Grab the entry in the queue (first index)
+
+    for (neighbor in graph[node] || []) {
+      if (!visited.has(neighbor)) {
+        visited.add(neighbor)
+        queue.push(neighbor)
+        order.push(neighbor)
+      }
+    }
+  }
+  
+  return order
+}
+
+// BackTracking tree traversal using Depth-first search
+// Solving the N-Queens problem using backtracking.
+function backtracking(n) {
+  board = Array(n).fill().map(() => Array(n).fill("."))
+  solutions = []
+
+  // Try to place the queen in a row, trying each column
+  function backtrackRow(row) {
+    if (row === n) {
+      solutions.push(board.map(r => r.join("")))
+      return
+    }
+
+    for (col = 0; col < n; col++) {
+      if (isSafe(board, row, col)) {
+        board[row][col] = "Q" // try this first
+  
+        backtrackRow(row + 1)  // try next row
+  
+        board[row][col] = "." // backtrack
+      }
+    }
+  }
+
+  function isSafe(board, row, col) {
+    // Check column first
+    for (let i = 0; i < row; i++) {
+      if (board[i][col] == "Q") return false
+    }
+    // Check upper-left diagnoal
+    for (let i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--) {
+      if (board[i][j] == "Q") return false
+    }
+    // Check upper-right diagnoal
+    for (let i = row - 1, j = col + 1; i >= 0 && j < n; i--, j++) {
+      if (board[i][j] == "Q") return false
+    }
+   return true 
+  }
+
+  backtrack(0) // starts the whole chain
+  return solutions
+}
+
+// Branch and Bound TSP using RCM
+/*  Example from book:
+*   [inf    12    11    16]
+*   [15    inf    15    10]
+*   [8      14   inf    18]
+*   [9      11    17   inf]
+*   best at the end: 44
+*/
+
+// Simplified (for now)
+function branchAndBound(costMatrix) {
+  n = costMatrix.length
+  bestCost = Infinity
+  bestPath = null
+
+  // Start with a RCM calculation of the start/root node
+  initialRCM = reduceMatrix(costMatrix)
+  initialLowerBound = calculateLowerBound(initialRCM)
+
+  // Recursive branch function
+  function branch(currentPath, currentCost, rcm, level) {
+    if (level == n) {
+      // last level - return out
+      last = currentPath[level-1]
+      frist = currentPath[0]
+      tourCost = currentCost + costMatrix[last][first]
+      if (tourCost < bestCost) {
+        bestCost = tourCost
+        bestPath = [...currentPath, first]
+      }
+      return
+    }
+
+    for (next = 0; next < n; next++) {
+      if (currentPath.includes(next)) continue // already visited
+
+      // Compute new recuded matrix for this branch
+      newRCM = createChildRCM(rm, currentPath[level-1], next)
+      newLB = currentCost + calculateLowerBound(newRCM)
+
+      if (newLB >= bestCost) continue // no need to keep this
+
+      currentPath.push(next)
+      nextCost = currentCost + costMatrix[currentPath[level-1]][next]
+      branch(currentPath, nextCost, newRCM, level + 1)
+      currentPath.pop() // Backtracking
+    }
+  }
+
+  branch([0], 0, initialRCM, 1) // Start from city 0
+
+  return { cost: bestCost, path: bestPath}
+}
+
+// Helper functions for the branchAndBound
+function reduceMatrix(matrix) {
+  // row/col reduction goes here
+}
+
+function calculateLowerBound(reduced) {
+  // sum of row minimums + col minimums
+}
+
+function createChildRCM(parentRCM, from, to) {
+  // set row from = Infinity
+  // set col to = Infinity
+  // set (to, from) = Infinity
+  // reduce again
+}
