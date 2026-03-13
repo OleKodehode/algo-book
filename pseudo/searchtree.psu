@@ -65,28 +65,21 @@ function BFSQ(root) {
 
 // Depth-first search in graphs using stack [First in, last out]
 function DFSG(graph, start) {
-  if (!graph) return
+  if (!start || !graph) return []
 
   stack = [start]
-  visited = new Set()
-  order = []
+  order = [start]
+  visited = new Set([start])
 
   while (stack.length > 0) {
     // Pop node X from stack
     node = stack.pop()
 
-    // If that node is directly connected to an unprocessed node, push all those nodes into the stack and mark them as processed.
-    if (!visited.has(node)) {
-      visited.add(node)
-      order.push(node)
-
-      // Push unvisited neighbors - Reverser order for left-to-right
-      neighbors = graph[node] || []
-      for (i = neighbors.length - 1; i >= 0; i--) {
-        neighborNode = neighbors[i]
-        if (!visited.has(neighborNode)) {
-          stack.push(neighborNode)
-        }
+    for (neighbor of graph[node] || []) {
+      if (!visisted.has(neighbor)) {
+        visited.add(neighbor)
+        stack.push(neighbor)
+        order.push(neighbor)
       }
     }
   }
@@ -96,6 +89,7 @@ function DFSG(graph, start) {
 
 // Breadth-first search in graphs using queue [First in, first out]
 function BFSG(graph, start) {
+  if (!start || !graph) return []
   queue = [start]
   order = [start]
   visited = new Set([start])
