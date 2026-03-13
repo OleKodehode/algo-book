@@ -52,7 +52,7 @@ def tree_bfs_queue(root: TreeNode) -> list[str]:
   return visited
 
 
-def print_testing(root: TreeNode | None, name: str = "Tree"):
+def print_testing(root: TreeNode | None, name: str = "Tree") -> None:
   """
   Helper function for debugging and testing functions.
   """
