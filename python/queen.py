@@ -72,7 +72,7 @@ def graph_dfs_stack(graph: Dict[str, List[str]], start: str) -> List[str]:
     graph: A Dict containing a string as the key, and a List of strings as the value.
     \nI.E { 'A' : ['B', 'C'] }
   """
-  if not graph or not start: return []
+  if not start or start not in graph: return []
 
   stack = [start]
   order = [start]
@@ -81,10 +81,34 @@ def graph_dfs_stack(graph: Dict[str, List[str]], start: str) -> List[str]:
   while stack:
     node = stack.pop()
 
-    for neighbor in graph[node]:
+    for neighbor in graph.get(node, []):
       if neighbor not in visited:
         visited.add(neighbor)
         stack.append(neighbor)
+        order.append(neighbor)
+
+  return order
+
+def graph_bfs_queue(graph: Dict[str, List[str]], start: str) -> List[str]:
+  """
+  breadth-first search in graphs using queue [First in, First out]
+  Arguments:
+    graph: A Dict containing a string as the key, and a List of strings as the value.
+    \nI.E { 'A' : ['B', 'C'] }
+  """
+  if not start or start not in graph: return []
+
+  queue = deque([start])
+  order = [start]
+  visited = set(start)
+
+  while queue:
+    node = queue.popleft()
+
+    for neighbor in graph.get(node, []):
+      if neighbor not in visited:
+        visited.add(neighbor)
+        queue.append(neighbor)
         order.append(neighbor)
 
   return order
@@ -107,6 +131,7 @@ def print_testing_graph(graph: Dict[str, List[str]] | None, name: str = "Graph",
   print(header)
   print(f"Start from {start}")
   print(f"DFS Graph (Stack): {graph_dfs_stack(graph, start)}\n") # type: ignore
+  print(f"BFS Graph (Queue): {graph_bfs_queue(graph, start)}\n") # type: ignore
   print(f"{"="*len(header)}")
 
 if __name__ == "__main__":
