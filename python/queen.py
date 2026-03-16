@@ -1,4 +1,5 @@
 from collections import deque
+from typing import Dict, List
 
 class TreeNode:
   """
@@ -23,7 +24,7 @@ class TreeNode:
     self.left: TreeNode = left
     self.right: TreeNode = right
 
-def tree_dfs_stack(root: TreeNode) -> list[str]:
+def tree_dfs_stack(root: TreeNode) -> List[str]:
   """
   Depth-first search using a stack [first in, last out]
   """
@@ -44,7 +45,7 @@ def tree_dfs_stack(root: TreeNode) -> list[str]:
 
   return visited
 
-def tree_bfs_queue(root: TreeNode) -> list[str]:
+def tree_bfs_queue(root: TreeNode) -> List[str]:
   """
   Breadth-first search using queue [First in, First out]
   """
@@ -64,19 +65,49 @@ def tree_bfs_queue(root: TreeNode) -> list[str]:
 
   return visited
 
-def graph_dfs_stack(graph):
+def graph_dfs_stack(graph: Dict[str, List[str]], start: str) -> List[str]:
+  """
+  Depth-first search in graphs using stack [First in, Last out]
+  Arguments:
+    graph: A Dict containing a string as the key, and a List of strings as the value.
+    \nI.E { 'A' : ['B', 'C'] }
+  """
+  if not graph or not start: return []
 
+  stack = [start]
+  order = [start]
+  visited = set(start)
 
+  while stack:
+    node = stack.pop()
 
-def print_testing(root: TreeNode | None, name: str = "Tree") -> None:
+    for neighbor in graph[node]:
+      if neighbor not in visited:
+        visited.add(neighbor)
+        stack.append(neighbor)
+        order.append(neighbor)
+
+  return order
+
+def print_testing_tree(root: TreeNode | None, name: str = "Tree") -> None:
   """
   Helper function for debugging and testing functions.
   """
   header = f"\n{"="*10} {name} {"="*10}"
-  print(header, "")
+  print(header)
   print(f"DFS (stack): {tree_dfs_stack(root)}\n") # type: ignore
   print(f"BFS (queue): {tree_bfs_queue(root)}") # type: ignore
   print(f"{"=" * len(header)}")
+
+def print_testing_graph(graph: Dict[str, List[str]] | None, name: str = "Graph", start: str = "A") -> None:
+  """
+  Helper function for debugging and testing.
+  """
+  header = f"\n{"="*10} {name} {"="*10}"
+  print(header)
+  print(f"Start from {start}")
+  print(f"DFS Graph (Stack): {graph_dfs_stack(graph, start)}\n") # type: ignore
+  print(f"{"="*len(header)}")
 
 if __name__ == "__main__":
   c = TreeNode("c")
@@ -89,6 +120,19 @@ if __name__ == "__main__":
 
   single = TreeNode("x") # for testing
 
-  print_testing(a, "Example from the book")
-  print_testing(single, "Single Node")
-  print_testing(None, "Empty Tree")
+  # Testing graph
+  graph = {
+    'A': ['B', 'C'],
+    'B': ['A', 'D', 'E'],
+    'C': ['A', 'F'],
+    'D': ['B'],
+    'E': ['B', 'F'],
+    'F': ['C', 'E']
+}
+
+  print_testing_tree(a, "Example from the book")
+  print_testing_tree(single, "Single Node")
+  print_testing_tree(None, "Empty Tree")
+  print_testing_graph(graph, "Example Graph")
+  print_testing_graph(graph, "Example Graph", "F")
+  print_testing_graph(None, "Empty input")
