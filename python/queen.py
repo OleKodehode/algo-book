@@ -72,7 +72,7 @@ def graph_dfs_stack(graph: Dict[str, List[str]], start: str) -> List[str]:
     graph: A Dict containing a string as the key, and a List of strings as the value.
     \nI.E { 'A' : ['B', 'C'] }
   """
-  if not start or start not in graph: return []
+  if not graph or not start or start not in graph: return []
 
   stack = [start]
   order = [start]
@@ -96,7 +96,7 @@ def graph_bfs_queue(graph: Dict[str, List[str]], start: str) -> List[str]:
     graph: A Dict containing a string as the key, and a List of strings as the value.
     \nI.E { 'A' : ['B', 'C'] }
   """
-  if not start or start not in graph: return []
+  if not graph or not start or start not in graph: return []
 
   queue = deque([start])
   order = [start]
@@ -112,6 +112,57 @@ def graph_bfs_queue(graph: Dict[str, List[str]], start: str) -> List[str]:
         order.append(neighbor)
 
   return order
+
+# Main function of queen.py
+def solve_nqueen(n: int, find_all: bool = False) -> List[List[str]]:
+  """
+  Solve N-Queens using backtracking.
+  Returns list of boards (Each board is a list of strings).
+  If find_all = false, return only the first solution found.
+  """
+
+  board = [["." for _ in range(n)] for _ in range(n)]
+  solutions = []
+
+  def is_safe(row: int, col: int) -> bool:
+    # Check column above
+    for i in range(row):
+      if board[i][col] == "Q":
+        return False
+      
+    # upper-left diagonal
+    i, j = row - 1, col - 1
+    while i >= 0 and j >= 0:
+      if board[i][j] == "Q": return False
+      i -= 1
+      j -= 1
+
+    i, j = row - 1, col + 1
+    while i >= 0 and j < n:
+      if board[i][j] == "Q": return False
+      i -= 1
+      j += 1
+
+    return True
+  
+  def backtrack(row: int):
+    if row == n:
+      # Found a solution
+      # When saving solution
+      solutions.append([row[:] for row in board])  # deep copy of the 2D list
+      return len(solutions) >= 1 and not find_all # Early exit if we only need one solution
+    
+    for col in range(n):
+      if is_safe(row, col):
+        board[row][col] = "Q"
+        if backtrack(row + 1):
+          return True # Early exit if we only need one solution
+        board[row][col] = "." # Backtrack
+
+    return False
+
+  backtrack(0)
+  return solutions
 
 def print_testing_tree(root: TreeNode | None, name: str = "Tree") -> None:
   """
@@ -133,6 +184,18 @@ def print_testing_graph(graph: Dict[str, List[str]] | None, name: str = "Graph",
   print(f"DFS Graph (Stack): {graph_dfs_stack(graph, start)}\n") # type: ignore
   print(f"BFS Graph (Queue): {graph_bfs_queue(graph, start)}\n") # type: ignore
   print(f"{"="*len(header)}")
+
+def print_board(board: List[str], title: str = "", cell_width: int = 3):
+  if title:
+    print(title)
+
+  for row in board:
+    line = "".join(
+      ("♛" if c == "Q" else "·").center(cell_width)
+      for c in row
+    )
+    print(line)
+  print()
 
 if __name__ == "__main__":
   c = TreeNode("c")
@@ -161,3 +224,36 @@ if __name__ == "__main__":
   print_testing_graph(graph, "Example Graph")
   print_testing_graph(graph, "Example Graph", "F")
   print_testing_graph(None, "Empty input")
+  
+  for n in [4,5,6,7,8, 9]:
+    """
+    n-queen will give a board of n x n
+    4x4 board got 2 possible solutions.
+    5x5 board got 10 possible solutions.
+    6x6 board got 4 possible solutions.
+    7x7 board got 40 possible solutions.
+    8x8 board got 92 possible solutions.
+    9x9 board got 352 possible solutions.
+
+    this starts scaling incredibly fast, so for this particular code, don't go much beyond 11.
+    (considering that 12x12 board will produce 14200 solutions)
+    """
+    print(f"\n{"="*35}")
+    print(f"N = {n}")
+
+    # One solution only
+    solution = solve_nqueen(n)
+    if solution:
+      print_board(solution[0], "One Solution Only")
+    else:
+      print(f"No solution found for N = {n}")
+
+    # All solutions
+    all_solutions = solve_nqueen(n, True)
+    print(f"Total amount of solutions found for a {n}x{n} board: {len(all_solutions)}")
+    for i, solution in enumerate(all_solutions, 1):
+      if i > 10: 
+        print("Breaking after 10 solutions.")
+        break
+      print_board(solution, f"Solution {i}")
+
